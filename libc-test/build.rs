@@ -6393,6 +6393,8 @@ struct Versions {
     netbsd: Option<(u32, u32)>,
     macos: Option<(u32, u32)>,
     emscripten: Option<(u32, u32)>,
+    /// Android API level (no minor version).
+    android: Option<u32>,
 }
 
 impl Versions {
@@ -6411,6 +6413,13 @@ impl Versions {
             #ifdef __GLIBC__
             /* Provides __GLIBC__, __GLIBC_MINOR__ (integers) */
             #include "gnu/libc-version.h"
+            #endif
+
+            #ifdef __ANDROID__
+            /* The clang driver predefines __ANDROID_MIN_SDK_VERSION__ from the API level
+             * in the target triple; including api-level.h ensures it is defined even on
+             * toolchains that leave it to the header. */
+            #include "android/api-level.h"
             #endif
 
             #if defined(__FreeBSD__) \
@@ -6477,6 +6486,11 @@ impl Versions {
                 }
                 "__GLIBC__" => ret.glibc.get_or_insert_default().0 = value.parse().unwrap(),
                 "__GLIBC_MINOR__" => ret.glibc.get_or_insert_default().1 = value.parse().unwrap(),
+                // Clang 12+ predefines the target API level here as a plain integer.
+                // Every NDK wrapper we build with carries an API level, so parse it like
+                // the other version macros above and let a missing value fail loudly at
+                // the unwrap in `test_android` rather than silently skipping tests.
+                "__ANDROID_MIN_SDK_VERSION__" => ret.android = Some(value.parse().unwrap()),
                 "__MAC_OS_X_VERSION_MAX_ALLOWED" => {
                     let caps = mac_re.captures(value).unwrap();
                     let major: u32 = caps[1].parse().unwrap();
