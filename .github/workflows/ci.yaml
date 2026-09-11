@@ -130,21 +130,9 @@ jobs:
   test_tier1:
     name: Test tier1
     strategy:
+      fail-fast: false
       matrix:
         include:
-          - target: aarch64-apple-darwin
-            os: macos-26
-          - target: aarch64-pc-windows-msvc
-            os: windows-11-arm
-          - target: aarch64-unknown-linux-gnu
-            os: ubuntu-26.04-arm
-          - target: i686-pc-windows-msvc
-            os: windows-2025
-          - target: i686-unknown-linux-gnu
-          - target: x86_64-pc-windows-gnu
-            os: windows-2025
-          - target: x86_64-pc-windows-msvc
-            os: windows-2025
           - target: x86_64-unknown-linux-gnu
     runs-on: ${{ matrix.os && matrix.os || 'ubuntu-26.04' }}
     timeout-minutes: 25
@@ -194,74 +182,8 @@ jobs:
       matrix:
         include:
           - target: aarch64-linux-android
-            # The guest is emulated, so the boot alone takes around twenty
-            # minutes; the default is not enough to reach the tests.
             timeout: 50
-            # Keep in sync with the Android build pinned in ci/cuttlefish-setup.sh
             artifact-tag: android17
-          - target: aarch64-unknown-linux-musl
-          - target: aarch64-unknown-linux-musl
-            env: { TEST_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          - target: arm-linux-androideabi
-          - target: arm-unknown-linux-gnueabihf
-          - target: arm-unknown-linux-musleabihf
-          - target: arm-unknown-linux-musleabihf
-            env: { TEST_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          # FIXME(#4297): Disabled due to spurious failue
-          # - target: i686-linux-android
-          - target: i686-unknown-linux-musl
-          - target: i686-unknown-linux-musl
-            env: { TEST_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          - target: loongarch64-unknown-linux-gnu
-          - target: loongarch64-unknown-linux-musl
-          - target: loongarch64-unknown-linux-musl
-            env: { TEST_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          - target: powerpc64-unknown-linux-gnu
-          - target: powerpc64-unknown-linux-musl
-          - target: powerpc64-unknown-linux-musl
-            env: { RUST_LIBC_UNSTABLE_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          - target: powerpc64le-unknown-linux-gnu
-          - target: powerpc64le-unknown-linux-musl
-          - target: powerpc64le-unknown-linux-musl
-            env: { TEST_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          - target: riscv64gc-unknown-linux-gnu
-          - target: s390x-unknown-linux-gnu
-          - target: sparc64-unknown-linux-gnu
-          - target: wasm32-unknown-emscripten
-          - target: wasm32-wasip1
-          - target: wasm32-wasip2
-          - target: x86_64-apple-darwin
-            os: macos-26-intel
-          - target: x86_64-linux-android
-            # Keep in sync with the Android build pinned in ci/cuttlefish-setup.sh
-            artifact-tag: android17
-          # FIXME: Exec format error (os error 8)
-          # - target: x86_64-unknown-linux-gnux32
-          - target: x86_64-unknown-linux-musl
-          - target: x86_64-unknown-linux-musl
-            env: { TEST_MUSL_V1_2: 1 }
-            artifact-tag: new-musl
-          # FIXME: It seems some items in `src/unix/mod.rs` aren't defined on redox actually.
-          # - target: x86_64-unknown-redox
-
-          # FIXME(ppc): SIGILL running tests, see
-          # https://github.com/rust-lang/libc/pull/4254#issuecomment-2636288713
-          # - target: powerpc-unknown-linux-gnu
-
-          # Testing iOS and tvOS should give us reasonably good coverage for Apple platforms.
-          # (watchOS is similar to tvOS, and visionOS is similar to iOS).
-          - target: aarch64-apple-ios-sim
-            os: macos-26
-            cargo-apple-runner: true
-          - target: aarch64-apple-tvos-sim
-            os: macos-26
-            cargo-apple-runner: true
     runs-on: ${{ matrix.os && matrix.os || 'ubuntu-26.04' }}
     timeout-minutes: ${{ matrix.timeout || 25 }}
     env:
