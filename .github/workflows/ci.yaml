@@ -192,11 +192,11 @@ jobs:
             # Keep in sync with the Android build pinned in ci/android-bionic-sysroot.sh
             artifact-tag: android17
           # Full Cuttlefish boot under TCG, disabled because it takes ~35m.
-          # - target: aarch64-linux-android
-          #   env: { TEST_ANDROID_CUTTLEFISH: 1 }
-          #   timeout: 50
-          #   # Keep in sync with the Android build pinned in ci/cuttlefish-setup.sh
-          #   artifact-tag: android17-cuttlefish
+          - target: aarch64-linux-android
+            env: { TEST_ANDROID_CUTTLEFISH: 1 }
+            timeout: 50
+            # Keep in sync with the Android build pinned in ci/cuttlefish-setup.sh
+            artifact-tag: android17-cuttlefish
           - target: aarch64-unknown-linux-musl
           - target: aarch64-unknown-linux-musl
             env: { TEST_MUSL_V1_2: 1 }
